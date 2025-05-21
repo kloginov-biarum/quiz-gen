@@ -10,13 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = emailInput.value;
             if (!email) {
                 messageArea.textContent = 'Please enter your email.';
-                messageArea.style.color = 'red';
+                messageArea.classList.remove('success');
+                messageArea.classList.add('error');
                 return;
             }
 
             playButton.disabled = true;
             messageArea.textContent = 'Starting...';
-            messageArea.style.color = 'black';
+            messageArea.classList.remove('error', 'success'); // Neutral message
 
             try {
                 const formData = new FormData();
@@ -34,17 +35,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Clear any quiz specific data from previous sessions
                     localStorage.removeItem('currentQuizScore');
                     localStorage.removeItem('quizStartTime');
-                    window.location.href = '/quiz'; // Redirect to quiz page (will be quiz.html)
+                    // Indicate successful start before redirecting (optional, as redirect is fast)
+                    messageArea.textContent = 'Quiz started! Redirecting...';
+                    messageArea.classList.remove('error');
+                    messageArea.classList.add('success');
+                    window.location.href = '/quiz'; // Redirect to quiz page
                 } else {
                     const errorData = await response.json();
                     messageArea.textContent = `Error: ${errorData.detail || 'Could not start quiz.'}`;
-                    messageArea.style.color = 'red';
+                    messageArea.classList.remove('success');
+                    messageArea.classList.add('error');
                     playButton.disabled = false;
                 }
             } catch (error) {
                 console.error('Error starting quiz:', error);
                 messageArea.textContent = 'An unexpected error occurred. Please try again.';
-                messageArea.style.color = 'red';
+                messageArea.classList.remove('success');
+                messageArea.classList.add('error');
                 playButton.disabled = false;
             }
         });

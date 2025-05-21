@@ -48,18 +48,18 @@ The Quiz Challenge is a web application designed to test users' knowledge throug
         docker-compose up
         ```
 4.  **Access the application**:
-    The Quiz Challenge app will be available at `http://localhost:8000`.
+    The Quiz Challenge app will be available at `http://localhost:8012`.
 
 ## Admin Access
 The admin interface provides access to user data and question management. An admin key is required to access these routes.
 
-*   **Admin Dashboard URL**: `http://localhost:8000/admin-dashboard-37Xp1fZ?admin_key=YOUR_ADMIN_KEY`
-*   **Question Management URL**: `http://localhost:8000/admin/questions?admin_key=YOUR_ADMIN_KEY`
+*   **Admin Dashboard URL**: `http://localhost:8012/admin-dashboard-37Xp1fZ?admin_key=YOUR_ADMIN_KEY`
+*   **Question Management URL**: `http://localhost:8012/admin/questions?admin_key=YOUR_ADMIN_KEY`
 
 **Admin Key Configuration:**
-*   **Default Development Key**: The `Dockerfile` sets a default `ADMIN_ACCESS_KEY` to `SUPER_SECRET_KEY_123!`. This is intended for development purposes only.
+*   **Default Development Key**: The `Dockerfile` sets a default `ADMIN_ACCESS_KEY` to `Aa123456`. This is intended for development purposes only.
 *   **Overriding with Docker Compose**: You can override this key when using Docker Compose by setting the `ADMIN_ACCESS_KEY_COMPOSE` environment variable.
-    *   The `docker-compose.yml` is configured to use `ADMIN_ACCESS_KEY_COMPOSE` if set, otherwise it falls back to `SUPER_SECRET_KEY_123_COMPOSE` (another default, showing precedence).
+    *   The `docker-compose.yml` is configured to use `ADMIN_ACCESS_KEY_COMPOSE` if set, otherwise it falls back to `Aa123456` (another default, showing precedence).
     *   For a persistent and secure way to set this for your local Docker Compose environment, create a `.env` file in the `quiz_app` directory (alongside `docker-compose.yml`) with your desired key:
         ```env
         # quiz_app/.env

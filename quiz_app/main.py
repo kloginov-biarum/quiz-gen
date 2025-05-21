@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import List, Optional # Ensure List and Optional are imported
 
-from . import crud, models, schemas, database
+import crud, models, schemas, database
 
 # Create database tables
 # Option 1: Call your function from database.py if it contains this line
@@ -31,7 +31,7 @@ def get_db():
         db.close()
 
 # Admin Protection
-ADMIN_KEY = os.getenv("ADMIN_ACCESS_KEY", "SUPER_SECRET_KEY_123!") # Default for dev
+ADMIN_KEY = os.getenv("ADMIN_ACCESS_KEY", "Aa123456") # Default for dev
 
 async def verify_admin_key(request: Request):
     provided_key = request.query_params.get("admin_key")

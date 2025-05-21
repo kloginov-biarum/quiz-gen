@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const addQuestionForm = document.getElementById('addQuestionForm');
     const adminMessageArea = document.getElementById('adminMessageArea');
-    const existingQuestionsTableBody = document.querySelector('#existingQuestionsTable tbody'); // More specific selector
+    const existingQuestionsTableBody = document.querySelector('#existingQuestionsTable tbody');
 
-    // Function to get admin_key from query params for API calls
     function getAdminKey() {
         const params = new URLSearchParams(window.location.search);
         return params.get('admin_key');
@@ -12,6 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addQuestionForm) {
         addQuestionForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+            adminMessageArea.textContent = ''; // Clear previous messages
+            adminMessageArea.classList.remove('success', 'error');
+
             const formData = new FormData(addQuestionForm);
             const text = formData.get('text');
             const options = [
@@ -19,24 +21,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.get('option2'),
                 formData.get('option3'),
                 formData.get('option4')
-            ].filter(opt => opt && opt.trim() !== ''); // Collect non-empty options
+            ].filter(opt => opt && opt.trim() !== '');
             const correctAnswer = formData.get('correct_answer');
 
             if (options.length < 2) {
                 adminMessageArea.textContent = 'Please provide at least two options.';
-                adminMessageArea.style.color = 'red';
+                adminMessageArea.classList.add('error');
                 return;
             }
             if (!options.includes(correctAnswer)) {
                 adminMessageArea.textContent = 'The correct answer must match one of the provided options.';
-                adminMessageArea.style.color = 'red';
+                adminMessageArea.classList.add('error');
                 return;
             }
 
             const adminKey = getAdminKey();
             if (!adminKey) {
-                adminMessageArea.textContent = 'Admin key missing from URL.';
-                adminMessageArea.style.color = 'red';
+                adminMessageArea.textContent = 'Admin key missing from URL. Ensure it is in the address bar.';
+                adminMessageArea.classList.add('error');
                 return;
             }
 
@@ -48,22 +50,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const result = await response.json();
                 if (response.ok) {
-                    adminMessageArea.textContent = result.message || 'Question added successfully!'; // API returns question object, not message
-                    adminMessageArea.style.color = 'green';
-                    if (result.id) { // Check if question object with id is returned
-                         adminMessageArea.textContent = `Question "${result.text.substring(0,30)}..." added successfully!`;
-                    }
+                    // API returns the question object on success
+                    adminMessageArea.textContent = `Question "${result.text.substring(0,30)}..." added successfully!`;
+                    adminMessageArea.classList.add('success');
                     addQuestionForm.reset();
-                    // Optionally, refresh the questions list or add the new question dynamically
-                    setTimeout(() => window.location.reload(), 1000); // Simple reload for now
+                    setTimeout(() => window.location.reload(), 1200); // Reload to see new question in table
                 } else {
                     adminMessageArea.textContent = `Error: ${result.detail || 'Could not add question.'}`;
-                    adminMessageArea.style.color = 'red';
+                    adminMessageArea.classList.add('error');
                 }
             } catch (error) {
                 console.error('Error adding question:', error);
-                adminMessageArea.textContent = 'An unexpected error occurred.';
-                adminMessageArea.style.color = 'red';
+                adminMessageArea.textContent = 'An unexpected error occurred while adding the question.';
+                adminMessageArea.classList.add('error');
             }
         });
     }
@@ -79,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const adminKey = getAdminKey();
                 if (!adminKey) {
-                    alert('Admin key missing from URL.');
+                    // Using alert for critical errors not tied to adminMessageArea directly
+                    alert('Admin key missing from URL. Cannot perform delete operation.');
                     return;
                 }
                 
@@ -87,17 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     const response = await fetch(`/admin/questions/${questionId}/delete?admin_key=${adminKey}`, {
                         method: 'POST',
                     });
-                    const result = await response.json();
+                    const result = await response.json(); // Expect JSON response for success/failure
                     if (response.ok) {
-                        alert(result.message || 'Question deleted successfully.');
-                        // Remove the row from the table or reload
+                        alert(result.message || 'Question deleted successfully.'); // Use alert for confirmation of delete
                         button.closest('tr').remove(); 
                     } else {
                         alert(`Error: ${result.detail || 'Could not delete question.'}`);
                     }
                 } catch (error) {
                     console.error('Error deleting question:', error);
-                    alert('An unexpected error occurred while deleting.');
+                    alert('An unexpected error occurred while deleting the question.');
                 }
             }
         });

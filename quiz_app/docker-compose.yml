@@ -3,16 +3,19 @@ version: '3.8'
 services:
   web:
     build:
-      context: .                 # Корень репозитория (там, где quiz_app/)
+      context: . # Dockerfile is in the same directory as docker-compose.yml (quiz_app)
       dockerfile: Dockerfile
     ports:
       - "8012:8012"
     volumes:
-      - quiz_data:/app/quiz_app  # Только папку с кодом монтируем в /app/quiz_app
+      # For development, mount current code for live reload (Uvicorn needs --reload for this)
+      # - ./:/app # Mounts the local quiz_app dir to the container's workdir /app
+      # For production, you typically don't mount the code like this.
+      # Volume for database persistence:
+      - quiz_data:/app # Mounts the quiz_data volume to /app where quiz_app.db will be created
     environment:
-      - ADMIN_ACCESS_KEY=${ADMIN_ACCESS_KEY_COMPOSE:-SUPER_SECRET_KEY_123_COMPOSE}
-    command: uvicorn quiz_app.main:app --host 0.0.0.0 --port 8012
+      - ADMIN_ACCESS_KEY=${ADMIN_ACCESS_KEY_COMPOSE:-Aa123456}
+    # command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload # For development
 
 volumes:
-  quiz_data:
-
+  quiz_data: # Defines a named volume for persisting the SQLite DB (e.g. quiz_app.db)

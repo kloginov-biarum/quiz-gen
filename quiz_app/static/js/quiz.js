@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let userEmail = localStorage.getItem('quizUserEmail');
 
     if (!userEmail) {
-        // Redirect to home if no user email (e.g. direct navigation to /quiz)
         window.location.href = '/';
         return;
     }
@@ -31,16 +30,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchQuestion() {
         feedbackArea.textContent = '';
-        answerOptionsContainer.innerHTML = ''; // Clear previous options
+        feedbackArea.classList.remove('success', 'error');
+        answerOptionsContainer.innerHTML = ''; 
         try {
             const response = await fetch('/quiz/question');
             if (!response.ok) {
                 const error = await response.json();
-                if (response.status === 404) { // No more questions
+                if (response.status === 404) {
                      feedbackArea.textContent = error.detail || "No more questions!";
+                     feedbackArea.classList.remove('success'); // Or neutral, but error might be more fitting if game ends unexpectedly
+                     feedbackArea.classList.add('error'); // Or a specific class for "game-over-info"
                      setTimeout(endQuiz, 2000);
                 } else {
-                     throw new Error(error.detail || 'Failed to fetch question');
+                     feedbackArea.textContent = error.detail || 'Failed to fetch question';
+                     feedbackArea.classList.remove('success');
+                     feedbackArea.classList.add('error');
+                     // Potentially throw to be caught by outer catch
                 }
                 return;
             }
@@ -50,11 +55,19 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error fetching question:', error);
             questionTextDisplay.textContent = 'Error loading question. Try refreshing.';
+            feedbackArea.textContent = 'Error loading question.';
+            feedbackArea.classList.remove('success');
+            feedbackArea.classList.add('error');
         }
     }
 
     function displayQuestion(question) {
         questionTextDisplay.textContent = question.text;
+        questionTextDisplay.classList.add('new-question');
+        setTimeout(() => {
+            questionTextDisplay.classList.remove('new-question');
+        }, 500); // Match CSS animation duration
+
         question.options.forEach(optionText => {
             const button = document.createElement('button');
             button.textContent = optionText;
@@ -64,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function submitAnswer(questionId, selectedAnswer, buttonEl) {
-        // Disable all option buttons
         const buttons = answerOptionsContainer.getElementsByTagName('button');
         for (let btn of buttons) {
             btn.disabled = true;
@@ -82,7 +94,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     time_taken_seconds: timeTakenSeconds
                 })
             });
-            if (!response.ok) throw new Error('Failed to submit answer');
+            if (!response.ok) { // Consider specific error handling if API can return useful details
+                feedbackArea.textContent = 'Failed to submit answer. Please try again or wait.';
+                feedbackArea.classList.remove('success');
+                feedbackArea.classList.add('error');
+                throw new Error('Failed to submit answer');
+            }
             
             const result = await response.json();
             score += result.points_awarded;
@@ -90,32 +107,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (result.correct) {
                 feedbackArea.textContent = `Correct! +${result.points_awarded} points`;
-                feedbackArea.style.color = 'green';
+                feedbackArea.classList.remove('error');
+                feedbackArea.classList.add('success');
                 buttonEl.classList.add('correct');
             } else {
                 feedbackArea.textContent = `Incorrect. Correct was: ${result.correct_answer}`;
-                feedbackArea.style.color = 'red';
+                feedbackArea.classList.remove('success');
+                feedbackArea.classList.add('error');
                 buttonEl.classList.add('incorrect');
-                // Highlight correct answer
                 for (let btn of buttons) {
                     if (btn.textContent === result.correct_answer) {
-                        btn.classList.add('correct');
+                        btn.classList.add('correct'); // Highlight the correct one
                         break;
                     }
                 }
             }
             
-            setTimeout(fetchQuestion, 2000); // Load next question after 2 seconds
+            setTimeout(fetchQuestion, 2000);
         } catch (error) {
             console.error('Error submitting answer:', error);
-            feedbackArea.textContent = 'Error submitting answer.';
-            // Re-enable buttons if submission fails and no new question is loaded
-             setTimeout(() => {
+            // feedbackArea.textContent set by if(!response.ok) or remains generic
+            if (!feedbackArea.textContent || !feedbackArea.classList.contains('error')) {
+                 feedbackArea.textContent = 'Error submitting answer.';
+                 feedbackArea.classList.remove('success');
+                 feedbackArea.classList.add('error');
+            }
+             setTimeout(() => { // Reset UI for next attempt if needed, or to allow user to see error
                  for (let btn of buttons) {
                      btn.disabled = false;
                      btn.classList.remove('correct', 'incorrect');
                  }
-                 feedbackArea.textContent = '';
+                 // feedbackArea.textContent = ''; // Don't clear error immediately
+                 // feedbackArea.classList.remove('success', 'error');
              }, 1500);
         }
     }
@@ -124,7 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
         clearInterval(timerInterval);
         timeLeftDisplay.textContent = '0';
         feedbackArea.textContent = "Time's up! Calculating score...";
-        answerOptionsContainer.innerHTML = ''; // Clear options
+        feedbackArea.classList.remove('error', 'success'); // Neutral for this message
+        answerOptionsContainer.innerHTML = '';
 
         try {
             const response = await fetch('/quiz/end', {
@@ -132,17 +156,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: userEmail, final_score: score })
             });
-            if (!response.ok) throw new Error('Failed to end quiz on server');
+            if (!response.ok) {
+                feedbackArea.textContent = 'Error saving your score. Please try again later.';
+                feedbackArea.classList.remove('success');
+                feedbackArea.classList.add('error');
+                throw new Error('Failed to end quiz on server');
+            }
             
             const resultData = await response.json();
             localStorage.setItem('lastQuizScore', resultData.final_score);
-            localStorage.setItem('quizUserHighScore', resultData.high_score); // Update high score
-            window.location.href = '/summary'; // Redirect to summary page
+            localStorage.setItem('quizUserHighScore', resultData.high_score);
+            window.location.href = '/summary';
         } catch (error) {
             console.error('Error ending quiz:', error);
-            feedbackArea.textContent = 'Error saving score. Your score was ' + score;
-            // Still redirect, or offer a retry? For now, just redirect.
-            localStorage.setItem('lastQuizScore', score); // Save locally at least
+            // feedbackArea.textContent already set if response.ok was false
+            if (!feedbackArea.classList.contains('error')) { // If error was from network or something else
+                feedbackArea.textContent = 'Error saving score. Your score was ' + score;
+                feedbackArea.classList.remove('success');
+                feedbackArea.classList.add('error');
+            }
+            localStorage.setItem('lastQuizScore', score);
             setTimeout(() => window.location.href = '/summary', 2000);
         }
     }
