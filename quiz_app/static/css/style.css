@@ -1,0 +1,192 @@
+/* Appended/Modified rules in style.css */
+
+/* General body and container from previous step - ensure .container has .fade-in */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font stack */
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5; /* Slightly softer background */
+    color: #333;
+    line-height: 1.6;
+    display: flex; /* Helps with footer later if needed */
+    flex-direction: column; /* Helps with footer later */
+    min-height: 100vh; /* Ensure footer sticks at bottom if page is short */
+}
+
+.container {
+    width: 90%;
+    max-width: 600px; /* Optimized for mobile quiz content */
+    margin: auto;
+    overflow: hidden; /* Clears floats */
+    padding: 20px;
+    background-color: #ffffff;
+    margin-top: 70px; /* More space for logo and top elements */
+    margin-bottom: 20px; /* Space from bottom */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    animation: fadeInEase 0.5s ease-in-out; /* Apply fade-in to container */
+}
+
+/* Logo styling (already in base.html, ensure it's respected) */
+header img[alt="Logo"] {
+    position: absolute; /* Or fixed if you want it always visible */
+    top: 15px;
+    right: 15px;
+    height: 45px; /* Slightly larger if design allows */
+    z-index: 1000;
+}
+
+h1, h2 {
+    color: #2c3e50; /* Darker, more professional color */
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+input[type="email"], input[type="text"], button, .options-container button {
+    display: block;
+    width: 100%;
+    padding: 12px 15px; /* More padding */
+    margin-bottom: 12px;
+    border-radius: 6px; /* Softer radius */
+    border: 1px solid #ced4da;
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+input[type="email"]:focus, input[type="text"]:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    outline: none;
+}
+
+button, .options-container button {
+    background-color: #007bff; /* Primary blue */
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.1s ease; /* Added transform */
+}
+
+button:hover, .options-container button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+button:active, .options-container button:active {
+    background-color: #004085; /* Even darker on active/tap */
+    transform: translateY(1px); /* Slight press down effect */
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.options-container button.correct {
+    background-color: #28a745; /* Bootstrap success green */
+    color: white;
+    border-color: #28a745;
+}
+.options-container button.correct:hover {
+    background-color: #218838;
+}
+
+.options-container button.incorrect {
+    background-color: #dc3545; /* Bootstrap danger red */
+    color: white;
+    border-color: #dc3545;
+}
+.options-container button.incorrect:hover {
+    background-color: #c82333;
+}
+
+/* Make sure these states are also applied if JS adds them */
+.options-container button.disabled, .options-container button:disabled {
+    background-color: #6c757d; /* Grey out disabled buttons */
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+#timer, #score {
+    text-align: center;
+    font-size: 1.25em;
+    margin-bottom: 20px;
+    color: #495057;
+}
+
+#feedbackArea, #adminMessageArea, #messageArea {
+    text-align: center;
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+#feedbackArea.success, #adminMessageArea.success, #messageArea.success { /* JS should add 'success' class */
+    background-color: #e6ffed;
+    color: #28a745;
+}
+
+#feedbackArea.error, #adminMessageArea.error, #messageArea.error { /* JS should add 'error' class */
+    background-color: #ffe6e6;
+    color: #dc3545;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+th, td {
+    border: 1px solid #dee2e6;
+    padding: 10px 12px; /* More padding in table cells */
+    text-align: left;
+}
+th {
+    background-color: #e9ecef; /* Lighter header for table */
+    font-weight: bold;
+    color: #495057;
+}
+
+/* Keyframe animation (already requested) */
+@keyframes fadeInEase {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .container {
+        width: 100%;
+        margin-top: 70px; /* Ensure space for logo */
+        padding: 15px;
+        border-radius: 0; /* Full width on small screens */
+        box-shadow: none;
+        margin-bottom: 0;
+    }
+    body {
+        background-color: #ffffff; /* Match container background on small screens */
+    }
+    h1 { font-size: 1.6em; }
+    h2 { font-size: 1.4em; }
+    button, .options-container button, input[type="email"], input[type="text"] {
+        padding: 12px; /* Ensure tappable height */
+        font-size: 1em;
+    }
+}
+
+/* Additional class for question text for potential animation */
+#questionText.new-question {
+    animation: fadeInEase 0.4s ease-in-out;
+}

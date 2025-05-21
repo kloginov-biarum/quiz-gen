@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <h1>Admin Dashboard - User Scores</h1>
+    
+    <a href="/admin/questions?admin_key={{ request.query_params.get('admin_key') }}" class="button admin-nav-button">Manage Questions</a>
+
+    <h2>User High Scores</h2>
+    <table id="userScoresTable">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>High Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.high_score }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="2">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Specific JS for admin dashboard if needed in the future -->
+{% endblock %}

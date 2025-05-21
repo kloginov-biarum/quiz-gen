@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Quiz App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', path='/img/logo.png') }}" alt="Logo" style="position: absolute; top: 10px; right: 10px; height: 40px; z-index: 1000;">
+    </header>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+    <footer>
+        <!-- Optional footer content here -->
+    </footer>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

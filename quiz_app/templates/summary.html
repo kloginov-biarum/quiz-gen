@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Summary{% endblock %}
+
+{% block content %}
+<div class="summary-container">
+    <h1>Quiz Over!</h1>
+    <p>Your final score is: <span id="finalScore">0</span></p>
+    <p>Your all-time high score: <span id="highScore">0</span></p>
+    <a href="/" class="button">Play Again?</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/summary.js') }}"></script>
+{% endblock %}

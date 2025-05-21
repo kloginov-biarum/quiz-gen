@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - In Progress{% endblock %}
+
+{% block content %}
+<div class="quiz-container">
+    <div class="quiz-header">
+        <div id="timer">Time: <span id="timeLeft">60</span>s</div>
+        <div id="score">Score: <span id="currentScore">0</span></div>
+    </div>
+    <div id="questionArea">
+        <h2 id="questionText">Loading question...</h2>
+        <div id="answerOptions" class="options-container">
+            <!-- Answer buttons will be dynamically inserted here by JavaScript -->
+        </div>
+    </div>
+    <div id="feedbackArea" class="message-area"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/quiz.js') }}"></script>
+{% endblock %}

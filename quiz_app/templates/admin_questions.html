@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Manage Questions{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <a href="/admin-dashboard-37Xp1fZ?admin_key={{ request.query_params.get('admin_key') }}" class="button admin-nav-button" style="margin-bottom: 20px;">Back to Dashboard</a>
+
+    <h2>Add New Question</h2>
+    <form id="addQuestionForm">
+        <div><label>Question Text: <input type="text" name="text" required class="admin-input"></label></div>
+        <div><label>Option 1: <input type="text" name="option1" required class="admin-input"></label></div>
+        <div><label>Option 2: <input type="text" name="option2" required class="admin-input"></label></div>
+        <div><label>Option 3 (optional): <input type="text" name="option3" class="admin-input"></label></div>
+        <div><label>Option 4 (optional): <input type="text" name="option4" class="admin-input"></label></div>
+        <div><label>Correct Answer (must match one of the options exactly): <input type="text" name="correct_answer" required class="admin-input"></label></div>
+        <button type="submit" class="button">Add Question</button>
+    </form>
+    <div id="adminMessageArea" class="message-area" style="margin-top: 15px;"></div>
+
+    <hr style="margin: 30px 0;">
+
+    <h2>Existing Questions</h2>
+    <table id="existingQuestionsTable">
+        <thead>
+            <tr>
+                <th>Text</th>
+                <th>Options</th>
+                <th>Correct Answer</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for q in questions %}
+            <tr>
+                <td>{{ q.text }}</td>
+                <td>{{ q.options | join(', ') }}</td>
+                <td>{{ q.correct_answer }}</td>
+                <td><button class="button deleteQuestionBtn" data-question-id="{{ q.id }}">Delete</button></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4">No questions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='/js/admin.js') }}"></script>
+{% endblock %}
