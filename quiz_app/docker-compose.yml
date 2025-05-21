@@ -3,16 +3,16 @@ version: '3.8'
 services:
   web:
     build:
-      context: .             # Корень, где лежит Dockerfile
+      context: .                 # Корень репозитория (там, где quiz_app/)
       dockerfile: Dockerfile
     ports:
       - "8012:8012"
     volumes:
-      # Монтируем том для хранения БД
-      - quiz_data:/app       # Кладём quiz_app.db внутрь /app, как и требуется
+      - quiz_data:/app/quiz_app  # Только папку с кодом монтируем в /app/quiz_app
     environment:
       - ADMIN_ACCESS_KEY=${ADMIN_ACCESS_KEY_COMPOSE:-SUPER_SECRET_KEY_123_COMPOSE}
     command: uvicorn quiz_app.main:app --host 0.0.0.0 --port 8012
 
 volumes:
   quiz_data:
+
